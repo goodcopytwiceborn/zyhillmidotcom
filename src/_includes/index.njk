@@ -42,7 +42,7 @@
       var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
       if (!nav || nav.type !== "reload") return;
       try { localStorage.removeItem("zanyiah-seen"); } catch (e) {}
-      try { ["zanyiah-read-more", "zanyiah-more-seen", "zanyiah-arrows-seen", "zanyiah-peek-seen"].forEach(function (k) { sessionStorage.removeItem(k); }); } catch (e) {}
+      try { ["zanyiah-read-more", "zanyiah-more-seen", "zanyiah-arrows-seen"].forEach(function (k) { sessionStorage.removeItem(k); }); } catch (e) {}
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -82,7 +82,7 @@
   <link rel="stylesheet" href="/assets/site.css">
   <script>document.documentElement.classList.add("js");</script>
   <script src="/assets/mockup.js" defer></script>
-  <script src="/assets/swap.js?v=25" defer></script>
+  <script src="/assets/swap.js?v=30" defer></script>
 </head>
 <body data-view="{{ view }}" data-home-state="{{ homeState or '' }}" data-font="mono" data-meta="mono" data-bio="a">
   <a class="skip" href="{% if view == 'home' %}#col1{% else %}#col2{% endif %}">Skip to content</a>

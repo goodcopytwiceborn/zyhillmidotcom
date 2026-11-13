@@ -549,19 +549,3 @@ a:focus-visible:not(.arena-item):not(.arena-badge), summary:focus-visible, .reve
   .glyph--spin:hover { animation: glyph-spin 0.7s cubic-bezier(.45,.05,.3,1); }
   .glyph--globe:hover { animation: glyph-twirl 0.9s cubic-bezier(.45,.05,.3,1); }
 }
-
-/* "Peek": when you reach the last project in Recent Work or Work in Progress, the next section's
-   list drops all the way open once, then snaps shut (animated from swap.js). The + stays still. */
-.sec-peek-preview { display: none; }
-.sec.peek:not([open]) > summary { flex-wrap: wrap; row-gap: 0; }
-.sec.peek:not([open]) .sec-title { flex: 1 1 0; min-width: 0; } /* keep the + on the title's line */
-.sec.peek:not([open]) .sec-peek-preview {
-  display: block; flex: 0 0 calc(100% + 2 * var(--pad)); margin: 0 calc(-1 * var(--pad));
-  height: 0; overflow: hidden;
-  font-size: 15px; line-height: 20px; font-weight: 400; letter-spacing: normal;
-}
-.sec-peek-item {
-  display: block;
-  padding: 5px var(--pad) 5px calc(var(--pad) + 2ch); text-indent: -2ch;
-}
-.sec-peek-item::before { content: "↳ "; color: var(--grey); }

@@ -73,7 +73,6 @@
     });
     // Mark the section that holds the current node/project (its + spins while closed).
     document.querySelectorAll("#col1 details").forEach((d) => d.classList.toggle("is-current", d === currentSection));
-    updatePeek();
 
     // After each navigation one section is open: ReadMe! on the landing page, otherwise the
     // section holding the project/node on screen, so its list stays in reach for the next one.
@@ -165,7 +164,6 @@
       list.push(location.pathname);
       try { sessionStorage.setItem(READ, JSON.stringify(list)); } catch {}
     }
-    updatePeek();
   }, true);
   settleReadMore();
   window.addEventListener("swap:loaded", settleReadMore);
@@ -243,65 +241,11 @@
   // closing the chosen section by hand clears it too.
   const sections = [...document.querySelectorAll("#col1 details")];
   let userToggled = null;
-  // On the last item of a section, the next section's row "peeks": it bounces open a little,
-  // over and over, until it's clicked (or you move to another item).
-  // Once a section has been clicked open, it never peeks again for the rest of the visit.
-  const PEEK = "zanyiah-peek-seen";
-  const peekSeen = () => { try { return JSON.parse(sessionStorage.getItem(PEEK)) || []; } catch { return []; } };
-  function markPeekSeen(id) {
-    const list = peekSeen();
-    if (list.includes(id)) return;
-    list.push(id);
-    try { sessionStorage.setItem(PEEK, JSON.stringify(list)); } catch {}
-  }
-  function updatePeek() {
-    document.querySelectorAll("#col1 details.peek").forEach((d) => d.classList.remove("peek"));
-    document.querySelectorAll("#col1 .sec-peek-preview").forEach((p) => p.remove());
-    const cur = document.querySelector("#col1 .sec-list a[aria-current]");
-    if (!cur) return;
-    // On a project with "[read more +]", wait until it's been opened, so the peek doesn't compete with it.
-    if (document.querySelector("#col2 details.more") && !readList().includes(location.pathname)) return;
-    const li = cur.closest("li");
-    if (li.nextElementSibling) return; // not the last item
-    const sec = cur.closest("details");
-    if (!["sec-recent", "sec-in-progress", "sec-archive"].includes(sec.id)) return; // status filters only
-    const next = sec.nextElementSibling;
-    if (!next || !next.matches("details.sec") || next.open || peekSeen().includes(next.id)) return;
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    next.classList.add("peek");
-    // A one-time glimpse: the next section's list drops all the way open, holds, then snaps shut.
-    // Plain text (no links inside the toggle); the real list opens when the row is clicked.
-    const preview = document.createElement("span");
-    preview.className = "sec-peek-preview";
-    preview.setAttribute("aria-hidden", "true");
-    next.querySelectorAll(".sec-list .sec-label").forEach((l) => {
-      const item = document.createElement("span");
-      item.className = "sec-peek-item";
-      item.textContent = l.textContent;
-      preview.append(item);
-    });
-    next.querySelector("summary").append(preview);
-    const full = preview.scrollHeight + 12;
-    markPeekSeen(next.id); // it plays once per visit
-    const anim = preview.animate(
-      [
-        { height: "0px", easing: "cubic-bezier(.2,.7,.3,1)" },
-        { height: full + "px", offset: 0.35 },
-        { height: full + "px", offset: 0.88, easing: "cubic-bezier(.6,0,1,1)" },
-        { height: "0px" },
-      ],
-      { duration: 2000, delay: 500, fill: "both" }
-    );
-    anim.onfinish = () => { next.classList.remove("peek"); preview.remove(); };
-  }
-
   sections.forEach((d) => {
     d.querySelector("summary").addEventListener("click", () => (userToggled = d));
     d.addEventListener("toggle", () => {
       const key = d.id.replace("sec-", "");
       if (d.open) {
-        d.classList.remove("peek");
-        if (userToggled === d) markPeekSeen(d.id);
         sections.forEach((other) => { if (other !== d) other.open = false; });
         filterKey = key === "about" ? null : key;
       } else if (userToggled === d && filterKey === key) {
@@ -312,6 +256,5 @@
     });
   });
   markSeen();
-  updatePeek();
   openSection(location.hash);
 })();
