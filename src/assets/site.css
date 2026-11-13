@@ -61,10 +61,9 @@ ul { padding: 0; list-style: none; }
 
 /* ── Links: three states ───────────────────────────────── */
 /* ref 06: thin underline sitting fully below the descenders */
-a {
-  color: inherit; text-decoration: underline; text-decoration-color: var(--green);
-  text-decoration-thickness: 1px; text-underline-offset: 0.3em; text-decoration-skip-ink: none;
-}
+/* No underlines on links anywhere (her rule); links show by colour, arrows (↗ ↳ ↓) and the green hover.
+   The one exception is "For further reading", which is grey and underlined by request. */
+a { color: inherit; text-decoration: none; }
 a:hover { background: var(--green); }
 .arrow { margin-left: 1px; }
 a.external::after { content: none; }
@@ -150,6 +149,7 @@ html:not(.js) .reveal::after { content: none; }
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
   padding: 6px var(--pad) 5px;
   font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; letter-spacing: var(--track-heading);
+  font-size: round(clamp(24px, 2.2vw, 30px), 1px); line-height: round(1.15em, 1px); /* whole pixels keep the row rules crisp */
   font-weight: 300; /* lighter section titles */
   list-style: none;
 }
@@ -178,7 +178,7 @@ html:not(.js) .reveal::after { content: none; }
 .sec-desc-icon { width: 1em; height: 1em; margin-top: 0.15em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
 .sec-desc-icon .dot { fill: currentColor; }
 .sec-body { padding: 6px var(--pad) 16px; }
-.sec-body .bio-lede { font-size: 17px; line-height: 1.3; }
+.sec-body .bio-lede { font-size: 17px; line-height: 22px; }
 .sec-body .bio-statement { font-size: 16px; }
 .sec-body .bio--b p { font-size: 14px; }
 /* Items inside a section:
@@ -188,7 +188,7 @@ html:not(.js) .reveal::after { content: none; }
    - each item is a full-width block with even padding, so spacing comes from one rhythm and the
      green highlight is a tidy bar instead of a ragged box around wrapped lines. */
 .sec-list { padding: 0 0 12px; }
-.sec-list li { font-size: 15px; line-height: 1.35; }
+.sec-list li { font-size: 15px; line-height: 20px; }
 .sec-list li + li { margin-top: 0; }
 .sec-list a {
   display: block; text-decoration: none;
@@ -366,9 +366,11 @@ body[data-bio="a"] .bio--b, body[data-bio="b"] .bio--a { display: none; }
   .index {
     flex: 1; min-height: 0;
     display: grid; grid-template-columns: minmax(250px, 23%) minmax(320px, 31%) 1fr;
+    /* whole, even pixel widths so the dotted column lines land on the pixel grid */
+    grid-template-columns: minmax(250px, round(down, 23%, 2px)) minmax(320px, round(down, 31%, 2px)) 1fr;
   }
   /* landing page: two columns (index + gallery); the text column appears once a node or project is opened */
-  body[data-view="home"] .index { grid-template-columns: minmax(250px, 23%) 1fr; }
+  body[data-view="home"] .index { grid-template-columns: minmax(250px, 23%) 1fr; grid-template-columns: minmax(250px, round(down, 23%, 2px)) 1fr; }
   .col { overflow-y: auto; overscroll-behavior: contain; }
   /* Scrollbars: a thin square black bar with no track, against the dotted column rule,
      green while dragged/hovered — matches the site's 1px lines and hover colour. */
@@ -383,17 +385,37 @@ body[data-bio="a"] .bio--b, body[data-bio="b"] .bio--a { display: none; }
     .col { scrollbar-width: thin; scrollbar-color: transparent transparent; }
     .col:hover { scrollbar-color: var(--ink) transparent; }
   }
-  .col + .col { border-left: var(--rule); }
+  /* The structural rules (top bar, column dividers, column 1 rows) are drawn as 1px-on/1px-off dots
+     on a fixed rhythm instead of browser "dotted" borders, so where they meet the dots never
+     collide: horizontals start on a dot, the column divider starts on a gap below the top bar. */
+  .col + .col { border-left: 0;
+    background: repeating-linear-gradient(to bottom, transparent 0 1px, var(--ink) 1px 2px) left top / 1px 100% no-repeat; }
 }
 body[data-view="home"] .col2 { display: none; }
 /* landing page gallery is wide, so three tiles per row (two elsewhere) */
 body[data-view="home"] .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 @media (max-width: 600px) { body[data-view="home"] .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
+/* ── Structural rules (top bar, column 1 rows, dividers) drawn as 1px-on/1px-off dots on one fixed
+   rhythm instead of browser "dotted" borders, so where lines meet the dots never bunch up: horizontals
+   start on a dot, the desktop column divider starts on a gap under the top bar, and row lines stop one
+   gap short of the divider. Used at every screen width. ── */
+.masthead { border-bottom: 0; padding-bottom: 11px;
+  background: var(--paper) repeating-linear-gradient(to right, var(--ink) 0 1px, transparent 1px 2px) left bottom / 100% 1px no-repeat; }
+.col1 .sec { border-bottom: 0; padding-bottom: 1px;
+  background: repeating-linear-gradient(to right, var(--ink) 0 1px, transparent 1px 2px) left bottom / calc(100% - 1px) 1px no-repeat; }
+.col1 .sec:last-child[open] { background: none; }
+
 /* ── Stacked (tablet / phone) ────────────────────────── */
 @media (max-width: 999.98px) {
   .index { display: flex; flex-direction: column; }
-  .col + .col { border-top: var(--rule); }
+  /* one dotted line between stacked blocks, following what's on screen (not the code order):
+     home: index → gallery; project/node: text → gallery → index. */
+  .col + .col { border-top: 0; }
+  body[data-view="home"] .col3, body:not([data-view="home"]) .col3, body:not([data-view="home"]) .col1 {
+    background: repeating-linear-gradient(to right, var(--ink) 0 1px, transparent 1px 2px) left top / 100% 1px no-repeat; }
+  /* home: the gallery's line already separates it from the last row, so that row's own line goes */
+  body[data-view="home"] .col1 .sec:last-child { background: none; }
   /* home: index (with About) → gallery. project/node: text → gallery → index */
   body[data-view="home"] .col1 { order: 1; }
   body[data-view="home"] .col3 { order: 2; }
