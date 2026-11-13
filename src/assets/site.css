@@ -53,7 +53,11 @@ ul { padding: 0; list-style: none; }
 .skip { position: absolute; left: -999px; top: 0; background: var(--green); color: var(--ink); padding: 8px 12px; z-index: 10; }
 .skip:focus { left: 8px; }
 
-:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; box-shadow: 0 0 0 6px var(--green); }
+/* Keyboard focus, where hover doesn't already highlight: a thin black line wrapped around the item. */
+:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; box-shadow: none; }
+/* Places the site moves focus to by itself after opening a page (the text column, page headings,
+   skip-link targets): no ring, so it never boxes in a whole column. */
+[tabindex="-1"]:focus, [tabindex="-1"]:focus-visible { outline: none; box-shadow: none; }
 
 /* ── Links: three states ───────────────────────────────── */
 /* ref 06: thin underline sitting fully below the descenders */
