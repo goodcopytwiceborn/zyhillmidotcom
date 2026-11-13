@@ -539,3 +539,13 @@ a:focus-visible:not(.arena-item):not(.arena-badge), summary:focus-visible, .reve
   .harrow:hover::after { transform: translateX(0.72em) rotate(45deg); }
   .bio-lede:has(.harrow:hover) .harrow-word { transform: translateX(0.4em); }
 }
+
+/* Bio glyphs on hover: the ⌘ spins once; the globe twirls on its axis like a desk globe. */
+.glyph--spin { display: inline-block; }
+.glyph--globe { transform-style: preserve-3d; }
+@keyframes glyph-spin { to { transform: rotate(360deg); } }
+@keyframes glyph-twirl { to { transform: perspective(40px) rotateY(360deg); } }
+@media (prefers-reduced-motion: no-preference) {
+  .glyph--spin:hover { animation: glyph-spin 0.7s cubic-bezier(.45,.05,.3,1); }
+  .glyph--globe:hover { animation: glyph-twirl 0.9s cubic-bezier(.45,.05,.3,1); }
+}
