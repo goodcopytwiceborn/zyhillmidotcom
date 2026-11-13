@@ -36,13 +36,23 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  {#- A reload resets the visit on the same page: nothing greyed out, the arrows and waves animate again. -#}
+  {#- A new visit starts fresh: nothing greyed out, the arrows and waves animate again.
+      A visit is new on a reload, when arriving from outside the site (typed, bookmarked, a link
+      from elsewhere, a new tab), or after 30 minutes away. swap.js keeps the clock and also resets
+      a tab left open past 30 minutes. -#}
   <script>
     (function () {
+      var IDLE = 30 * 60 * 1000, now = Date.now(), last = 0, fresh = false;
+      try { last = +localStorage.getItem("zanyiah-last") || 0; } catch (e) {}
       var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
-      if (!nav || nav.type !== "reload") return;
-      try { localStorage.removeItem("zanyiah-seen"); } catch (e) {}
-      try { ["zanyiah-read-more", "zanyiah-more-seen", "zanyiah-arrows-seen"].forEach(function (k) { sessionStorage.removeItem(k); }); } catch (e) {}
+      var ref = ""; try { ref = document.referrer ? new URL(document.referrer).origin : ""; } catch (e) {}
+      if (!nav || nav.type === "reload" || now - last > IDLE) fresh = true;
+      else if (nav.type === "navigate" && ref !== location.origin) fresh = true;
+      if (fresh) {
+        try { localStorage.removeItem("zanyiah-seen"); } catch (e) {}
+        try { ["zanyiah-read-more", "zanyiah-more-seen", "zanyiah-arrows-seen"].forEach(function (k) { sessionStorage.removeItem(k); }); } catch (e) {}
+      }
+      try { localStorage.setItem("zanyiah-last", String(now)); } catch (e) {}
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -82,7 +92,7 @@
   <link rel="stylesheet" href="/assets/site.css">
   <script>document.documentElement.classList.add("js");</script>
   <script src="/assets/mockup.js" defer></script>
-  <script src="/assets/swap.js?v=30" defer></script>
+  <script src="/assets/swap.js?v=31" defer></script>
 </head>
 <body data-view="{{ view }}" data-home-state="{{ homeState or '' }}" data-font="mono" data-meta="mono" data-bio="a">
   <a class="skip" href="{% if view == 'home' %}#col1{% else %}#col2{% endif %}">Skip to content</a>

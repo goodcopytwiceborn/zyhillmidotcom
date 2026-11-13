@@ -104,7 +104,28 @@
   // Projects and nodes a visitor has opened are greyed out in column 1, so they can see
   // what's left. Remembered in their own browser only.
   const SEEN_KEY = "zanyiah-seen";
+  // The visit clock (see the script in the page head): touched on every move around the site.
+  // Coming back to a tab that's been left for 30+ minutes starts the visit over, as a new one would.
+  const LAST = "zanyiah-last", IDLE = 30 * 60 * 1000;
+  const touch = () => { try { localStorage.setItem(LAST, String(Date.now())); } catch {} };
+  function freshIfIdle() {
+    let last = 0;
+    try { last = +localStorage.getItem(LAST) || 0; } catch {}
+    if (Date.now() - last > IDLE) {
+      try { localStorage.removeItem(SEEN_KEY); } catch {}
+      try { ["zanyiah-read-more", "zanyiah-more-seen", "zanyiah-arrows-seen"].forEach((k) => sessionStorage.removeItem(k)); } catch {}
+      document.body.classList.remove("more-seen", "arrows-seen");
+      document.querySelectorAll("details.more").forEach((d) => d.classList.remove("opened"));
+      markSeen();
+    }
+    touch();
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") freshIfIdle(); else touch(); });
+  window.addEventListener("focus", freshIfIdle);
+  document.addEventListener("pointerdown", freshIfIdle, true);
+  document.addEventListener("keydown", freshIfIdle, true);
   function markSeen() {
+    touch();
     let seen = [];
     try { seen = JSON.parse(localStorage.getItem(SEEN_KEY)) || []; } catch {}
     const here = location.pathname;
