@@ -6,6 +6,23 @@
   if (!("fetch" in window) || !("DOMParser" in window)) return;
   const wide = window.matchMedia("(min-width: 1000px)");
 
+  // Tab title scrolls like a ticker (after Mindy Seu's site): "Zanyiah Hill-Milling — Body of Work — "
+  // moves one letter left every 0.4s and loops. Search engines still read the plain <title> in the HTML.
+  // Still for reduced-motion users; paused while the tab is in the background.
+  const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let tickerText = "", tickerPos = 0;
+  function setTitle(t) {
+    tickerText = t.replace(/\s+—\s*$/, "") + " — ";
+    tickerPos = 0;
+    document.title = calm.matches ? t : tickerText;
+  }
+  setInterval(() => {
+    if (calm.matches || document.hidden || !tickerText) return;
+    tickerPos = (tickerPos + 1) % tickerText.length;
+    document.title = tickerText.slice(tickerPos) + tickerText.slice(0, tickerPos);
+  }, 400);
+  setTitle(document.title);
+
   // "/#sec-recent" etc. (a section breadcrumb) filters the Index to that section
   // (breadcrumbs + gallery) but leaves every section in column 1 closed.
   let filterKey = null;
@@ -40,7 +57,7 @@
     document.getElementById("col3").scrollTop = 0;
     document.body.dataset.view = next.body.dataset.view;
     document.body.dataset.homeState = next.body.dataset.homeState;
-    document.title = next.title;
+    setTitle(next.title);
 
     // Mirror the highlighted node/project in column 1.
     document.querySelectorAll("#col1 a[aria-current]").forEach((a) => a.removeAttribute("aria-current"));
@@ -206,7 +223,7 @@
     const sec = filterKey && document.getElementById("sec-" + filterKey);
     const title = sec && sec.querySelector(".sec-title").textContent;
     filterGallery(sec ? filterKey : null);
-    document.title = title || "Zanyiah Hill-Milling — Body of Work";
+    setTitle(title || "Zanyiah Hill-Milling — Body of Work");
     // Full name on the landing state; first name only once a section joins the trail.
     document.querySelector(".crumbs").innerHTML = title
       ? `<li><span>ZANYIAH</span>${sep}</li><li><a href="/" data-swap>Index</a>${sep}</li><li><span aria-current="page">${title}</span></li>`
