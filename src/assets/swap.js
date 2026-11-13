@@ -8,18 +8,20 @@
 
   // Tab title scrolls like a ticker (after Mindy Seu's site): "Zanyiah Hill-Milling — Body of Work — "
   // moves one letter left every 0.4s and loops. Search engines still read the plain <title> in the HTML.
-  // Still for reduced-motion users; paused while the tab is in the background.
+  // Keeps moving when the tab is in the background too. Browsers slow background timers to about
+  // once a second, so the position follows the clock (one letter per 0.4s) and catches up on each tick.
+  // Still for reduced-motion users.
   const calm = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let tickerText = "", tickerPos = 0;
+  let tickerText = "", tickerStart = Date.now();
   function setTitle(t) {
     tickerText = t.replace(/\s+—\s*$/, "") + " — ";
-    tickerPos = 0;
+    tickerStart = Date.now();
     document.title = calm.matches ? t : tickerText;
   }
   setInterval(() => {
-    if (calm.matches || document.hidden || !tickerText) return;
-    tickerPos = (tickerPos + 1) % tickerText.length;
-    document.title = tickerText.slice(tickerPos) + tickerText.slice(0, tickerPos);
+    if (calm.matches || !tickerText) return;
+    const pos = Math.floor((Date.now() - tickerStart) / 400) % tickerText.length;
+    document.title = tickerText.slice(pos) + tickerText.slice(0, pos);
   }, 400);
   setTitle(document.title);
 
