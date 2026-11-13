@@ -39,7 +39,7 @@
     return true;
   }
 
-  async function load(url, { push = true } = {}) {
+  async function load(url, { push = true, openToggle = false } = {}) {
     const target = new URL(url, location.href);
     let html;
     try {
@@ -86,7 +86,11 @@
     markSeen();
     window.dispatchEvent(new Event("swap:loaded"));
 
-    if (openSection(target.hash)) return;
+    if (openSection(target.hash)) {
+      // Links from the ReadMe! page also open that section's list in column 1.
+      if (openToggle) document.getElementById(target.hash.slice(1)).open = true;
+      return;
+    }
 
     // Move focus to the new heading so keyboard and screen-reader users land
     // on the content that changed.
@@ -116,7 +120,7 @@
     if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (a.origin !== location.origin) return;
     e.preventDefault();
-    load(a.href);
+    load(a.href, { openToggle: a.hasAttribute("data-open-section") });
   });
 
   window.addEventListener("popstate", () => load(location.href, { push: false }));
