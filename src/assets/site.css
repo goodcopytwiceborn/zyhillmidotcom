@@ -521,3 +521,21 @@ a:focus-visible { background: var(--green); }
 .arena-badge:focus-visible { background: var(--green); }
 .rd-mark:focus-visible { background: var(--ink); color: var(--paper); }
 a:focus-visible:not(.arena-item):not(.arena-badge), summary:focus-visible, .reveal:focus-visible { outline: none; box-shadow: none; }
+
+/* Bio "media ↔ technology": the ↔ drawn as a line with two arrowheads. On hover the line lengthens
+   into the spaces on either side (heads slide outward, keeping their shape) without taking up any
+   more room, so the text never reflows or jumps to another line. */
+.harrow { display: inline-flex; align-items: center; vertical-align: middle; height: 1em; padding: 0 0.15em; position: relative; top: -0.05em; }
+.harrow::before, .harrow::after { content: ""; width: 0.26em; height: 0.26em; border: 0 solid currentColor; flex: none; position: relative; z-index: 1; }
+.harrow::before { border-left-width: 0.09em; border-bottom-width: 0.09em; transform: translateX(0) rotate(45deg); margin-right: -0.24em; }
+.harrow::after { border-right-width: 0.09em; border-top-width: 0.09em; transform: translateX(0) rotate(45deg); margin-left: -0.24em; }
+.harrow-line { display: block; width: 0.7em; border-top: 0.09em solid currentColor; transform-origin: center; }
+@media (prefers-reduced-motion: no-preference) {
+  .harrow::before, .harrow::after, .harrow-line { transition: transform 0.4s cubic-bezier(.3,1.2,.5,1); }
+  /* "technology" slides right a touch as the arrow reaches toward it (a visual shift, so nothing rewraps) */
+  .harrow-word { display: inline-block; transition: transform 0.4s cubic-bezier(.3,1.2,.5,1); }
+  .harrow:hover .harrow-line { transform: translateX(0.18em) scaleX(2.55); }
+  .harrow:hover::before { transform: translateX(-0.36em) rotate(45deg); }
+  .harrow:hover::after { transform: translateX(0.72em) rotate(45deg); }
+  .bio-lede:has(.harrow:hover) .harrow-word { transform: translateX(0.4em); }
+}
