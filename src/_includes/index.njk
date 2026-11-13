@@ -36,6 +36,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  {#- A reload resets the visit on the same page: nothing greyed out, the arrows and waves animate again. -#}
+  <script>
+    (function () {
+      var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+      if (!nav || nav.type !== "reload") return;
+      try { localStorage.removeItem("zanyiah-seen"); } catch (e) {}
+      try { ["zanyiah-read-more", "zanyiah-more-seen", "zanyiah-arrows-seen"].forEach(function (k) { sessionStorage.removeItem(k); }); } catch (e) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {#- Tab title: the Index section and the item — "Work in Progress — The Oz", "Nodes — How is work…";
       a section filter alone on the home page ("Work in Progress", set by swap.js); otherwise "Zanyiah Hill-Milling — Body of Work". -#}
