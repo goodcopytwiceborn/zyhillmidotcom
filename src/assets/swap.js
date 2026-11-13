@@ -73,6 +73,7 @@
     });
     // Mark the section that holds the current node/project (its + spins while closed).
     document.querySelectorAll("#col1 details").forEach((d) => d.classList.toggle("is-current", d === currentSection));
+    updatePeek();
 
     // After each navigation one section is open: ReadMe! on the landing page, otherwise the
     // section holding the project/node on screen, so its list stays in reach for the next one.
@@ -164,6 +165,7 @@
       list.push(location.pathname);
       try { sessionStorage.setItem(READ, JSON.stringify(list)); } catch {}
     }
+    updatePeek();
   }, true);
   settleReadMore();
   window.addEventListener("swap:loaded", settleReadMore);
@@ -241,11 +243,42 @@
   // closing the chosen section by hand clears it too.
   const sections = [...document.querySelectorAll("#col1 details")];
   let userToggled = null;
+  // On the last item of a section, the next section's row "peeks": it bounces open a little,
+  // over and over, until it's clicked (or you move to another item).
+  function updatePeek() {
+    document.querySelectorAll("#col1 details.peek").forEach((d) => d.classList.remove("peek"));
+    document.querySelectorAll("#col1 .sec-peek-preview").forEach((p) => p.remove());
+    const cur = document.querySelector("#col1 .sec-list a[aria-current]");
+    if (!cur) return;
+    // On a project with "[read more +]", wait until it's been opened, so the peek doesn't compete with it.
+    if (document.querySelector("#col2 details.more") && !readList().includes(location.pathname)) return;
+    const li = cur.closest("li");
+    if (li.nextElementSibling) return; // not the last item
+    const sec = cur.closest("details");
+    if (!["sec-recent", "sec-in-progress", "sec-archive"].includes(sec.id)) return; // status filters only
+    const next = sec.nextElementSibling;
+    if (!next || !next.matches("details.sec") || next.open) return;
+    next.classList.add("peek");
+    // A glimpse of what's inside: the first couple of titles, shown in the row as it bounces open.
+    // Plain text (no links inside the toggle); the real list opens when the row is clicked.
+    const preview = document.createElement("span");
+    preview.className = "sec-peek-preview";
+    preview.setAttribute("aria-hidden", "true");
+    [...next.querySelectorAll(".sec-list .sec-label")].slice(0, 2).forEach((l) => {
+      const item = document.createElement("span");
+      item.className = "sec-peek-item";
+      item.textContent = l.textContent;
+      preview.append(item);
+    });
+    next.querySelector("summary").append(preview);
+  }
+
   sections.forEach((d) => {
     d.querySelector("summary").addEventListener("click", () => (userToggled = d));
     d.addEventListener("toggle", () => {
       const key = d.id.replace("sec-", "");
       if (d.open) {
+        d.classList.remove("peek");
         sections.forEach((other) => { if (other !== d) other.open = false; });
         filterKey = key === "about" ? null : key;
       } else if (userToggled === d && filterKey === key) {
@@ -256,5 +289,6 @@
     });
   });
   markSeen();
+  updatePeek();
   openSection(location.hash);
 })();
