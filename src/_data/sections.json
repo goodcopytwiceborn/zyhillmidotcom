@@ -1,0 +1,6 @@
+[
+  {"key": "nodes", "title": "Nodes", "desc": "Themes that connect my work, interests, and experience."},
+  {"key": "recent", "title": "Recent Work", "desc": "Complete enough to share, but not necessarily finished forever."},
+  {"key": "in-progress", "title": "Work in Progress", "desc": "Things I’m actively working on. Some are more developed than others."},
+  {"key": "archive", "title": "Archive", "desc": "Earlier work I want to preserve, even if I would approach it differently now."}
+]

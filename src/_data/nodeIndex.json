@@ -1,0 +1,80 @@
+[
+  {
+    "slug": "experiences-support-work",
+    "number": "01",
+    "question": "How do the experiences we design support the work people do?",
+    "description": "Services, spaces, and systems in the workplace.",
+    "tags": [
+      "workplace",
+      "education",
+      "design"
+    ]
+  },
+  {
+    "slug": "future-already-designed",
+    "number": "02",
+    "question": "How much of our future is already designed?",
+    "description": "Decisions become habits, habits become culture, and culture shapes the decisions we make. ",
+    "tags": [
+      "public-health",
+      "consent",
+      "tech"
+    ]
+  },
+  {
+    "slug": "work-reorganized",
+    "number": "03",
+    "question": "How is work being reorganized?",
+    "description": "Work evolves alongside tools and expectations, for better or for worse. ",
+    "tags": [
+      "future-of-work",
+      "automation",
+      "process",
+      "operations"
+    ]
+  },
+  {
+    "slug": "automation-of-work",
+    "number": "04",
+    "question": "How do we participate in the automation of work?",
+    "description": "What makes a machine generated output useful, meaningful, or our own.",
+    "tags": [
+      "ai",
+      "literacy",
+      "ownership"
+    ]
+  },
+  {
+    "slug": "create-distribute-meaning",
+    "number": "05",
+    "question": "How do we create and distribute meaning?",
+    "description": "Self-expression as a way to interpret and communicate meaning, online.",
+    "tags": [
+      "digital-culture",
+      "memory",
+      "storytelling"
+    ]
+  },
+  {
+    "slug": "knowledge-through-exchange",
+    "number": "06",
+    "question": "How is knowledge supported through exchange?",
+    "description": "Spaces for discovery and exchange through curation and conversation.",
+    "tags": [
+      "community",
+      "access",
+      "social-media"
+    ]
+  },
+  {
+    "slug": "interact-with-text",
+    "number": "07",
+    "question": "How do we interact with text?",
+    "description": "Information in a visual-first culture. ",
+    "tags": [
+      "publishing",
+      "accessibility",
+      "attention"
+    ]
+  }
+]

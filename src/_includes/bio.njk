@@ -1,0 +1,21 @@
+{%- macro platformLink(pl) -%}
+{%- if pl.copy -%}
+<a class="copy-email" href="{{ pl.url }}" data-copy="{{ pl.copy }}">{{ pl.label }}<svg class="glyph glyph--copy" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="8" y="8" width="13" height="13" rx="1"/><path d="M16 8V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h4"/></svg><span class="vh"> (copies the address)</span><span class="copy-status" role="status" aria-live="polite"></span></a>
+{%- elif pl.url -%}
+<a class="external" href="{{ pl.url }}" target="_blank" rel="noopener">{{ pl.label }}<span class="vh"> (opens in new tab)</span></a>
+{%- else -%}
+{% pending pl.label %}
+{%- endif -%}
+{%- endmacro -%}
+<div class="bio bio--a">
+  <p class="bio-lede">What I do exists somewhere between media <span class="glyph" aria-hidden="true">↔</span><span class="vh">and</span> technology. I’ve found it easier to show than explain. <span class="glyph" aria-hidden="true">⌘</span> B.S. in Innovation, Society, and Technology + Agile Project Management. Most recently, Content Operations and Innovation at Netflix, Los Angeles. {# Email first (copies the address), then the globe and the web platforms. #}
+  {% for pl in site.platforms %}{% if pl.copy %}{{ platformLink(pl) }}, {% endif %}{% endfor %}<svg class="glyph glyph--globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="4.2" ry="10"/><path d="M2 12h20M3.6 7h16.8M3.6 17h16.8"/></svg>
+  {% set web = [] %}{% for pl in site.platforms %}{% if not pl.copy %}{% set web = (web.push(pl), web) %}{% endif %}{% endfor %}{% for pl in web %}{{ platformLink(pl) }}{% if not loop.last %}, {% else %}.{% endif %} {% endfor %}
+  <a class="more-link" href="/readme/">(<span class="wave"><span style="--i:0">m</span><span style="--i:1">o</span><span style="--i:2">r</span><span style="--i:3">e</span><span style="--i:4">…</span></span>)</a></p>
+</div>
+<div class="bio bio--b">
+  <p class="bio-statement">IN LOVE WITH DESIGN. DOCUMENT EVERYTHING. EASIER TO SHOW THAN EXPLAIN.</p>
+  <p><strong>Education</strong> B.S. Innovation, Society, and Technology + Agile Project Management · Global Workplace Program, London · Media and Changing Communities, Copenhagen</p>
+  <p><strong>Most recently</strong> Netflix, Content Operations and Innovation, Los Angeles</p>
+  <p>{% for pl in site.platforms %}{% if pl.copy %}{{ platformLink(pl) }} {% endif %}{% endfor %}{% for pl in site.platforms %}{% if not pl.copy %}{{ platformLink(pl) }}{% if pl.external %}<span aria-hidden="true" class="arrow">↗</span>{% endif %} {% endif %}{% endfor %}· <a class="more-link" href="/readme/">(<span class="wave"><span style="--i:0">m</span><span style="--i:1">o</span><span style="--i:2">r</span><span style="--i:3">e</span><span style="--i:4">…</span></span>)</a></p>
+</div>

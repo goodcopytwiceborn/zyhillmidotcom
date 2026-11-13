@@ -1,0 +1,6 @@
+[
+  { "from": "/about/", "to": "/readme/" },
+  { "from": "/work/the-oz-complex/", "to": "/work/the-oz/" },
+  { "from": "/work/nts-radio-show/", "to": "/work/nts-supporter-radio/" },
+  { "from": "/work/art-labor-and-ai-anxiety/", "to": "/work/art-labor-and-ai-nxiety/" }
+]

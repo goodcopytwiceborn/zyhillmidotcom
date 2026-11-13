@@ -1,0 +1,11 @@
+---
+layout: index.njk
+view: node
+pagination:
+  data: nodeIndex
+  size: 1
+  alias: node
+permalink: "/nodes/{{ node.slug }}/"
+eleventyComputed:
+  title: "{{ node.question }}"
+---

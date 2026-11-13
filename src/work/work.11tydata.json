@@ -1,0 +1,7 @@
+{
+  "layout": "index.njk",
+  "view": "project",
+  "permalink": "/work/{{ slug }}/",
+  "arena": null,
+  "copyInMockup": true
+}

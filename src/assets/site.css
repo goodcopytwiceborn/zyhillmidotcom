@@ -1,0 +1,499 @@
+/* @zanyiah — layout mockup
+   Black/white base. Internet green is used two ways:
+   --green      lime fill #BDFD08 (behind black text, ≈17:1) and underlines
+   --green-text darker shade for green text on white (#007A00 ≈ 5.6:1) */
+:root {
+  --ink: #000;
+  --paper: #fff;
+  --green: #bdfd08;          /* lime from the reference; black text on it ≈ 17:1 */
+  --green-text: #007a00;
+  --grey: #5f5f5f;          /* ≈ 6.4:1 on white */
+  --ph: #f1f1f1;
+  --rule: 1px dotted var(--ink);
+  --sans: "Arimo", Arial, Helvetica, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --meta: var(--mono);
+  --pad: 16px;
+  /* Tracking scale: tighten as type gets bigger, open up small caps.
+     Monospace sets every letter in an equal-width cell, so large sizes look gappy
+     and tiny uppercase looks crowded; these values even that out. */
+  --track-heading: -0.02em;  /* 24–30px headings */
+  --track-lead: -0.01em;     /* 18–20px lead text */
+  --track-caps: 0.04em;      /* uppercase at 14–15px */
+  --track-micro: 0.08em;     /* uppercase at 11px */
+}
+/* Mono everywhere (the nav bar's typeface), now the default */
+body[data-font="mono"] { --sans: var(--mono); }
+body[data-font="system"] { --sans: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+body[data-meta="sans"] { --meta: var(--sans); }
+
+*, *::before, *::after { box-sizing: border-box; }
+/* Custom cursor (diamond-pixel arrow from Zanyiah's reference), used everywhere incl. links. */
+html, a, button, summary, .link-pending, .reveal { cursor: url("/assets/cursor.svg?v=4") 4 0, auto; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.45 var(--sans);
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+/* Monospace word spaces are a full letter wide; pull them in slightly so lines read as phrases. */
+body[data-font="mono"] { word-spacing: -0.06em; }
+.masthead, .mockbar, .tag, .status, .label, .tile-title { word-spacing: normal; }
+h1, h2, p, ul, dl, dd { margin: 0; }
+[hidden] { display: none !important; }
+ul { padding: 0; list-style: none; }
+
+.vh {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.skip { position: absolute; left: -999px; top: 0; background: var(--green); color: var(--ink); padding: 8px 12px; z-index: 10; }
+.skip:focus { left: 8px; }
+
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; box-shadow: 0 0 0 6px var(--green); }
+
+/* ── Links: three states ───────────────────────────────── */
+/* ref 06: thin underline sitting fully below the descenders */
+a {
+  color: inherit; text-decoration: underline; text-decoration-color: var(--green);
+  text-decoration-thickness: 1px; text-underline-offset: 0.3em; text-decoration-skip-ink: none;
+}
+a:hover { background: var(--green); }
+.arrow { margin-left: 1px; }
+a.external::after { content: none; }
+/* Pending: no destination yet — grey text with a grey underline, same weight and offset as links */
+.link-pending {
+  color: var(--grey);
+  text-decoration: underline var(--grey);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  text-decoration-skip-ink: none;
+  cursor: inherit;
+}
+/* Links in the written copy (projects + About), one system across the site:
+   ↗ after a link that leaves the site, ↳ before a page on this site,
+   ↓ after a jump to further down the same page. No underline; green on hover. */
+.prose a.external, .prose a.internal, .prose a.jump { text-decoration: none; }
+.prose a.internal::before { content: "↳\00a0"; content: "↳\00a0" / ""; }
+.prose a.jump::after { content: "\00a0↓"; content: "\00a0↓" / ""; }
+/* Body links: grey text, arrow kept. */
+.prose a.external, .prose a.internal, .prose a.jump, .prose .arrow { color: var(--grey); }
+.prose a.external:hover, .prose a.internal:hover, .prose a.jump:hover { color: var(--ink); }
+/* A phrase that reveals the points it refers to, in place (e.g. "strengths and limitations"):
+   grey, no underline, ↓ after it (↑ while open). */
+.reveal { color: var(--grey); }
+.reveal:hover { background: var(--green); color: var(--ink); }
+.reveal::after { content: "\00a0↓"; content: "\00a0↓" / ""; }
+.reveal[aria-expanded="true"]::after { content: "\00a0↑"; content: "\00a0↑" / ""; }
+/* The points: marked (a), (b)… with a hanging indent, grey, set in from the text. */
+.prose ul.points { margin: -0.3em 0 1.2em 2ch; color: var(--grey); counter-reset: point; }
+.prose ul.points li { counter-increment: point; padding-left: 4ch; text-indent: -4ch; margin-bottom: 0.6em; }
+.prose ul.points li::before { content: "(" counter(point, lower-alpha) ")\00a0"; display: inline-block; width: 4ch; text-indent: 0; }
+/* Without JavaScript the points simply stay visible. */
+html:not(.js) .prose ul.points[hidden] { display: block !important; }
+html:not(.js) .reveal::after { content: none; }
+
+/* Grey text in the body has no underline (pending references included); only further reading is underlined. */
+.prose .link-pending { text-decoration: none; }
+.prose .further .link-pending { text-decoration: underline var(--grey); }
+/* For further reading: grey + underlined, no arrows. */
+.prose .further a { text-decoration: underline var(--grey); text-decoration-thickness: 1px; text-underline-offset: 0.3em; text-decoration-skip-ink: none; }
+.prose .further .arrow, .prose .further a.internal::before { display: none; content: none; }
+
+/* ── Masthead: ref 06 slashed nav ─────────────────────── */
+.masthead {
+  display: flex; justify-content: space-between; align-items: baseline; gap: var(--pad);
+  padding: 10px var(--pad) 8px;
+  border-bottom: var(--rule);
+}
+/* Breadcrumbs, same type and states as the old index/about nav */
+/* one line: the last crumb ends in "…" when it doesn't fit */
+.masthead nav { min-width: 0; flex: 1; }
+.crumbs { display: flex; flex-wrap: nowrap; margin: 0; padding: 0; list-style: none; font-size: clamp(28px, 3.4vw, 44px); line-height: 1.05; letter-spacing: -0.02em; }
+.crumbs { text-transform: uppercase; }
+.crumbs li { flex: none; white-space: nowrap; }
+.crumbs li:last-child { flex: 0 1 auto; min-width: 0; display: flex; }
+.crumbs li:last-child > :not(.crumb-sep) { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crumbs a { color: var(--ink); text-decoration: none; }
+.crumbs [aria-current="page"] { background: var(--ink); color: var(--paper); }
+.crumbs a:hover { background: var(--green); color: var(--ink); }
+.crumb-sep { white-space: pre; }
+
+/* (more…) shares the [read more] font and hover */
+/* 0.9em: the mono face draws larger and wider than Arimo at the same size */
+.more-link { font-family: var(--meta); font-size: 0.9em; text-decoration: none; white-space: nowrap; }
+.glyph { display: inline-block; margin: 0 0.05em; }
+/* 🌐︎-style web icon, drawn as a line icon so it stays black-and-white in every browser */
+.glyph--globe { width: 0.85em; height: 0.85em; vertical-align: -0.1em; fill: none; stroke: currentColor; stroke-width: 1.6; }
+/* Email: copy-to-clipboard link with a small copy icon; "Copied" shows briefly after a click. */
+.copy-email { color: var(--ink); text-decoration: none; white-space: nowrap; }
+.glyph--copy { width: 0.8em; height: 0.8em; margin-left: 0.25em; vertical-align: -0.08em; fill: none; stroke: currentColor; stroke-width: 1.8; }
+.copy-status { font-family: var(--meta); font-size: 11px; letter-spacing: var(--track-micro); text-transform: uppercase; color: var(--grey); margin-left: 0.4em; }
+.copy-status:empty { display: none; }
+.more-link:hover { background: var(--green); }
+
+/* ── Three columns (ref 05) ───────────────────────────── */
+.col { padding: var(--pad); }
+/* Column 1: ref 11 rows, + / − instead of an arrow */
+.col1 { padding: 0; }
+.sec { border-bottom: var(--rule); }
+/* no closing line under the last section's open list */
+.sec:last-child[open] { border-bottom: 0; }
+.sec summary {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 6px var(--pad) 5px;
+  font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; letter-spacing: var(--track-heading);
+  font-weight: 300; /* lighter section titles */
+  list-style: none;
+}
+.sec summary::-webkit-details-marker { display: none; }
+.sec summary:hover { background: var(--green); }
+.sec-icon::before { content: "+"; font-size: 0.8em; }
+.sec[open] .sec-icon::before { content: "−"; }
+/* "You are here": the closed section holding the current node/project spins its + slowly.
+   With reduced motion, it holds still at 45° (×) on a green square instead. */
+.sec-icon::before { display: inline-block; }
+@keyframes sec-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: no-preference) {
+  .sec.is-current:not([open]) .sec-icon::before { animation: sec-spin 3s linear infinite; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sec.is-current:not([open]) .sec-icon::before { transform: rotate(45deg); background: var(--green); }
+}
+.sec-list { padding: 4px var(--pad) 14px; }
+/* section descriptions (from the About ReadMe) */
+/* descriptor: info icon + hanging indent, lighter than the project list so it doesn't read as an item */
+.sec-desc {
+  display: grid; grid-template-columns: 1.6em 1fr; align-items: start;
+  margin: 4px var(--pad) 8px; padding: 4px 0;
+  font-size: 15px; line-height: 1.3; color: var(--grey);
+}
+.sec-desc-icon { width: 1em; height: 1em; margin-top: 0.15em; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.sec-desc-icon .dot { fill: currentColor; }
+.sec-body { padding: 6px var(--pad) 16px; }
+.sec-body .bio-lede { font-size: 17px; line-height: 1.3; }
+.sec-body .bio-statement { font-size: 16px; }
+.sec-body .bio--b p { font-size: 14px; }
+/* Items inside a section:
+   - indented under the title with a ↳ marker (the same "belongs to" mark used for connections),
+     so they read as children of the section, not as more headings;
+   - hanging indent: wrapped lines line up with the text, not the marker, so each item keeps one clean left edge;
+   - each item is a full-width block with even padding, so spacing comes from one rhythm and the
+     green highlight is a tidy bar instead of a ragged box around wrapped lines. */
+.sec-list { padding: 0 0 12px; }
+.sec-list li { font-size: 15px; line-height: 1.35; }
+.sec-list li + li { margin-top: 0; }
+.sec-list a {
+  display: block; text-decoration: none;
+  padding: 5px var(--pad) 5px calc(var(--pad) + 2ch);
+  text-indent: -2ch;
+}
+.sec-list a::before { content: "↳ "; content: "↳ " / ""; color: var(--grey); }
+/* hover / current: highlight the words only, not the whole row (wraps line by line) */
+.sec-list a:hover { background: none; }
+.sec-label { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.sec-list a:hover .sec-label, .sec-list a[aria-current="page"] .sec-label { background: var(--green); color: var(--ink); }
+/* opened before: greyed out (the one on screen stays highlighted) */
+.sec-list a.seen:not([aria-current]) { color: var(--grey); }
+.sec-list a:hover::before, .sec-list a[aria-current="page"]::before { color: var(--ink); }
+
+.status { font-family: var(--meta); font-size: 11px; color: var(--grey); white-space: nowrap; letter-spacing: var(--track-micro); }
+
+.col2 h1 { font-size: clamp(24px, 2.2vw, 30px); line-height: 1.1; letter-spacing: var(--track-heading); font-weight: 400; margin-bottom: 14px; }
+.col2:focus { outline: none; }
+.eyebrow, .label, .meta, .hint, .draft-note, .cite, .pmeta dt { font-family: var(--meta); font-size: 11px; letter-spacing: var(--track-micro); color: var(--grey); text-transform: uppercase; }
+.label { margin: 22px 0 8px; font-weight: 400; }
+.meta { margin-top: 14px; text-transform: none; }
+.node-desc { font-size: 18px; line-height: 1.35; letter-spacing: var(--track-lead); }
+.connections li { padding: 3px 0; }
+.pnodes li { font-size: 14px; padding: 1px 0; }
+/* ref 08: a ↳ arrow marks these links instead of a green underline */
+.connections a, .pnodes a { text-decoration: none; }
+.connections li::before, .pnodes li::before { content: "↳\00a0"; content: "↳\00a0" / ""; }
+
+/* bio: ref 05/08 */
+.bio-lede { font-size: 20px; line-height: 1.3; letter-spacing: var(--track-lead); }
+.bio--b p { margin-bottom: 10px; }
+.bio-statement { font-size: 18px; font-weight: 700; line-height: 1.2; }
+body[data-bio="a"] .bio--b, body[data-bio="b"] .bio--a { display: none; }
+.draft-note { margin-top: 18px; text-transform: none; letter-spacing: 0.02em; border: 1px dashed var(--grey); padding: 6px 8px; }
+
+.pmeta { margin-bottom: 22px; display: grid; gap: 10px; }
+
+.tile .tags { margin-top: 6px; }
+
+.prose { max-width: 62ch; }
+.prose p, .prose ul { margin-bottom: 0.9em; }
+.prose ul.muted { padding-left: 1.1em; list-style: disc; color: var(--grey); }
+.prose .further { font-size: 14px; margin-top: 2em; }
+.prose ul.about-list { padding-left: 1.1em; list-style: disc; }
+.prose ul.about-list li, .prose ul.readme li { margin-bottom: 0.5em; }
+/* About: each section gets the big page-header style, in caps. */
+.col2 .about-h { font-size: clamp(24px, 2.2vw, 30px); line-height: 1.1; letter-spacing: var(--track-heading); font-weight: 400; margin: 36px 0 14px; }
+.prose ul.about-list { list-style: none; padding-left: 0; }
+.col2 .about-h:first-child { margin-top: 0; }
+.note { color: var(--grey); font-size: 14px; border-left: 3px solid var(--green); padding-left: 10px; }
+.to-index { display: none; margin-top: 24px; }
+
+/* [read more] expands in place */
+.more summary { list-style: none; font-family: var(--meta); font-size: 13px; margin-bottom: 0.9em; width: fit-content; }
+.more summary::-webkit-details-marker { display: none; }
+.more summary:hover, .more[open] > summary { background: var(--green); }
+.more .more-open, .more[open] .more-closed { display: none; }
+.more[open] .more-open { display: inline; }
+
+/* tags: ref 12 boxed hash, ref 15 green highlight */
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { font-family: var(--meta); font-size: 11px; letter-spacing: 0.02em; border: 1px solid var(--ink); padding: 1px 4px; line-height: 1.4; }
+
+/* ── Gallery ──────────────────────────────────────────── */
+.ph {
+  display: grid; place-items: center; text-align: center;
+  background: var(--ph); border: 1px solid var(--ink);
+  font-family: var(--mono); font-size: 11px; color: var(--grey); padding: 8px;
+}
+.ph--cover, .ph--image { aspect-ratio: 4 / 3; }
+.ph--link { aspect-ratio: 16 / 9; }
+.ph--text { aspect-ratio: 1; background: var(--paper); }
+.ph--attachment { aspect-ratio: 3 / 4; }
+
+.tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; }
+.tile-link { display: block; text-decoration: none; }
+.tile-link:hover { background: none; }
+.tile-title { display: inline; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: var(--track-caps); }
+.tile-link .ph { margin-bottom: 6px; }
+/* Thumbnail: an empty white box with the same dotted rule as the rest of the layout. */
+.tile-box { display: block; aspect-ratio: 4 / 3; background: var(--paper); border: var(--rule); margin-bottom: 6px; }
+/* Hover/focus: the box fills green; the title stays as is. */
+.tile-link:hover .tile-box, .tile-link:focus-visible .tile-box { background: var(--green); }
+.tile-meta { margin: 4px 0; }
+
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px 16px; align-items: start; }
+.cite { margin-top: 5px; text-transform: none; }
+/* ── Are.na gallery (build-time). Images bare like her photos; text/link/file blocks as plain cards.
+   Title + source show over the item on hover or keyboard focus. ── */
+.gallery--arena { align-items: start; }
+.arena-item { position: relative; display: block; color: var(--ink); text-decoration: none; }
+.arena-item:hover { background: none; }
+.arena-item img { display: block; width: 100%; height: auto; background: var(--ph); }
+.arena-text { display: block; font-size: 13px; line-height: 1.45; padding: 12px; border: var(--rule); background: var(--paper); }
+.arena-card { display: flex; flex-direction: column; gap: 6px; aspect-ratio: 4 / 3; padding: 12px; border: var(--rule); font-size: 13px; line-height: 1.35; }
+.arena-card-kind { font-family: var(--meta); font-size: 11px; letter-spacing: var(--track-micro); text-transform: uppercase; color: var(--grey); }
+.arena-info {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 6px 8px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--ink); color: var(--paper); font-family: var(--meta); font-size: 11px; line-height: 1.35;
+  opacity: 0; transition: opacity 0.12s ease-out; pointer-events: none;
+}
+.arena-info-source { color: var(--green); }
+.arena-item:hover .arena-info, .arena-item:focus-visible .arena-info { opacity: 1; }
+.item--text .arena-info, .item--link .arena-info, .item--file .arena-info, .item--channel .arena-info { position: static; opacity: 1; background: none; color: var(--grey); padding: 5px 0 0; }
+.item--text .arena-info-source, .item--link .arena-info-source, .item--file .arena-info-source, .item--channel .arena-info-source { color: var(--grey); }
+.item--text .arena-info-title, .item--link .arena-info-title, .item--file .arena-info-title, .item--channel .arena-info-title { display: none; }
+.arena-item:hover .arena-text, .arena-item:hover .arena-card { background: var(--green); }
+/* Real photos: shown whole at the column width (no cropping, no enlarge), bare — no border, no caption. */
+.gallery--photos img { display: block; width: 100%; height: auto; background: var(--ph); }
+.tile-cover { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; margin-bottom: 6px; background: var(--ph); }
+/* A logo on a solid ground (Netflix N, Airbnb symbol): shown whole, smaller, centred, on its own colour (coverBg). */
+.tile-cover--logo { object-fit: contain; background: var(--cover-bg, #000); padding: 14% 0; }
+.flag { color: var(--grey); }
+
+/* ── Top bar: white with black type (inverted), same typeface as the content ──
+   breadcrumbs on the left, external links on the right.
+   A touch taller than the first-column rows so it reads as the top level of navigation.
+   Type sits between the section titles (largest) and the metadata (smallest). */
+.masthead {
+  align-items: center; min-height: 52px; padding: 10px var(--pad); border-bottom: var(--rule);
+  background: var(--paper); color: var(--ink);
+  font-family: var(--sans); font-size: 15px;
+}
+.masthead .crumbs { font-size: inherit; line-height: 1.4; letter-spacing: var(--track-caps); }
+.masthead .crumbs a, .masthead .crumbs span { color: var(--ink); }
+.masthead .crumbs [aria-current="page"] { background: var(--ink); color: var(--paper); padding: 3px 8px; }
+.masthead .crumbs a { padding: 3px 0; }
+.masthead .sitebar-links { gap: 24px; letter-spacing: 0.02em; }
+.masthead .crumbs a:hover { background: var(--green); color: var(--ink); }
+.masthead .crumb-sep { color: var(--grey); }
+.sitebar-links { display: flex; gap: 18px; flex: none; }
+.masthead nav[aria-label="Elsewhere"] { flex: none; }
+.masthead a.external, .bio a.external { color: var(--ink); text-decoration: none; }
+.masthead a.external:hover { color: var(--ink); }
+.masthead .link-pending { color: var(--grey); text-decoration-color: var(--grey); }
+.sitebar-links .arrow { margin-left: 4px; }
+/* LinkedIn / Are.na ↗: both arrows nudge up-and-right together — two nudges, a pause, repeat —
+   until someone clicks LinkedIn or Are.na (top corner or bio); then they stay still for the rest
+   of the visit (swap.js adds .arrows-seen). Off for reduced-motion users. */
+.sitebar-links .arrow, .bio .arrow { display: inline-block; }
+@keyframes nudge-ne {
+  0%, 16%, 32%, 100% { transform: translate(0, 0); }
+  8%, 24% { transform: translate(2px, -2px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sitebar-links .arrow, .bio .arrow { animation: nudge-ne 3s ease-in-out 0.6s infinite; }
+  .arrows-seen .sitebar-links .arrow, .arrows-seen .bio .arrow { animation: none; }
+}
+
+
+/* ── Mockup bar ──────────────────────────────────────── */
+.mockbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px;
+  padding: 8px var(--pad); background: var(--ink); color: var(--paper);
+  font-family: var(--mono); font-size: 12px;
+}
+.mockbar-label { background: var(--green); color: var(--ink); padding: 1px 6px; }
+.seg { display: flex; align-items: center; gap: 4px; }
+.seg span { margin-right: 4px; color: #bbb; }
+.seg button {
+  font: inherit; color: var(--paper); background: transparent;
+  border: 1px solid var(--paper); padding: 2px 8px;
+}
+.seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); }
+.legend { display: flex; gap: 10px; align-items: baseline; margin-left: auto; }
+.legend > span:first-child { color: #bbb; }
+.mockbar .link-pending { color: #bbb; text-decoration-color: #bbb; }
+.mockbar a:hover { color: var(--ink); }
+
+/* ── Desktop: three columns, columns 2 and 3 scroll independently ── */
+@media (min-width: 1000px) {
+  body { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+  .index {
+    flex: 1; min-height: 0;
+    display: grid; grid-template-columns: minmax(250px, 23%) minmax(320px, 31%) 1fr;
+  }
+  /* landing page: two columns (index + gallery); the text column appears once a node or project is opened */
+  body[data-view="home"] .index { grid-template-columns: minmax(250px, 23%) 1fr; }
+  .col { overflow-y: auto; overscroll-behavior: contain; }
+  /* Scrollbars: a thin square black bar with no track, against the dotted column rule,
+     green while dragged/hovered — matches the site's 1px lines and hover colour. */
+  .col::-webkit-scrollbar { width: 3px; }
+  .col::-webkit-scrollbar-track { background: transparent; }
+  /* hidden at rest so every page looks the same; appears while the pointer is over that column */
+  .col::-webkit-scrollbar-thumb { background: transparent; border-radius: 0; }
+  .col:hover::-webkit-scrollbar-thumb { background: var(--ink); }
+  .col::-webkit-scrollbar-thumb:hover, .col::-webkit-scrollbar-thumb:active { background: var(--green); }
+  /* Firefox (it ignores the rules above) */
+  @supports (-moz-appearance: none) {
+    .col { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+    .col:hover { scrollbar-color: var(--ink) transparent; }
+  }
+  .col + .col { border-left: var(--rule); }
+}
+body[data-view="home"] .col2 { display: none; }
+/* landing page gallery is wide, so three tiles per row (two elsewhere) */
+body[data-view="home"] .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 600px) { body[data-view="home"] .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ── Stacked (tablet / phone) ────────────────────────── */
+@media (max-width: 999.98px) {
+  .index { display: flex; flex-direction: column; }
+  .col + .col { border-top: var(--rule); }
+  /* home: index (with About) → gallery. project/node: text → gallery → index */
+  body[data-view="home"] .col1 { order: 1; }
+  body[data-view="home"] .col3 { order: 2; }
+  body:not([data-view="home"]) .col2 { order: 1; }
+  body:not([data-view="home"]) .col3 { order: 2; }
+  body:not([data-view="home"]) .col1 { order: 3; }
+  .to-index { display: block; }
+  .legend { margin-left: 0; }
+}
+@media (max-width: 600px) {
+  .tiles { grid-template-columns: repeat(2, 1fr); gap: 20px 12px; }
+  .gallery { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* ── Are.na badge: a green disc with the Are.na mark turning in it (after e-flux's SHOP disc) ──
+   Bottom-right of the content area, where the eye ends a left-to-right scan and where it
+   doesn't sit on the text column or the breadcrumbs. 88px on desktop (a clear target, but
+   smaller than a gallery tile so it reads as a stamp, not content); 64px on phones. */
+.index { position: relative; }
+.arena-slot { display: contents; }
+.arena-badge {
+  position: absolute; right: 28px; bottom: 24px; z-index: 5;
+  width: 88px; height: 88px; display: block;
+  text-decoration: none; color: var(--ink); border-radius: 50%;
+}
+.arena-badge { background: var(--green); display: grid; place-items: center; }
+.arena-badge-mark { width: 62%; height: auto; display: block; fill: var(--ink); }
+.arena-badge:hover { background: var(--green); }
+@keyframes arena-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: no-preference) {
+  .arena-badge-mark { animation: arena-spin 10s linear infinite; }
+}
+/* Phones: the page scrolls as one, so pin it to the screen corner instead. */
+@media (max-width: 999px) {
+  .arena-badge { position: fixed; right: 16px; bottom: 16px; width: 64px; height: 64px; }
+}
+
+/* "(more…)": the letters of "more…" ripple in a small wave (parentheses stay still) until it's
+   clicked; then it rests for the rest of the visit (swap.js adds .more-seen). Off for reduced motion. */
+.wave > span { display: inline-block; }
+@keyframes wave-bob {
+  0%, 40%, 100% { transform: translateY(0); }
+  20% { transform: translateY(-0.22em); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wave > span { animation: wave-bob 1.8s ease-in-out infinite; animation-delay: calc(var(--i) * 0.09s); }
+  .more-seen .more-link .wave > span { animation: none; }
+  .more.opened .wave > span { animation: none; }
+}
+
+/* ReadMe! page, "About ZANYIAH." only: the longer personal paragraphs get looser leading and
+   clearer gaps. The rest of the page keeps the site's standard text spacing. */
+.prose.about ul.about-list li { line-height: 1.7; margin-bottom: 1.15em; }
+
+/* ── ReadMe! “How to navigate.”: relationship diagram (reference 15) — highlighted terms,
+   thin bracket lines dropping to what each holds. ── */
+.rd { margin: 0 0 1.2em; }
+.rd-lede { margin: 0; }
+.rd-mark { background: var(--green); color: var(--ink); text-decoration: none; padding: 0 3px; }
+.rd-mark:hover { background: var(--ink); color: var(--paper); }
+/* stem from the sentence down into a bracket: a vertical line with ticks at the top and bottom */
+.rd-bracket { position: relative; list-style: none; margin: 0 0 0 2ch; padding: 22px 0 0 26px; }
+/* the vertical line is drawn per item so it stops exactly at the last tick, however long the text */
+.rd-bracket li::after { content: ""; position: absolute; left: -26px; top: 0; bottom: -14px; border-left: 1px solid var(--ink); }
+.rd-bracket li:first-child::after { top: -22px; }
+.rd-bracket li:last-child::after { bottom: auto; height: 0.75em; }
+.rd-bracket li:first-child:last-child::after { height: calc(0.75em + 22px); }
+.rd-bracket li { position: relative; margin: 0 0 14px; }
+.rd-bracket li:last-child { margin-bottom: 0; }
+.rd-bracket li::before { content: ""; position: absolute; left: -26px; top: 0.75em; width: 18px; border-top: 1px solid var(--ink); }
+/* a bracket nested inside an item (the work inside a node) starts under that item's text */
+.rd-bracket .rd-bracket { margin-top: 0; padding-top: 18px; }
+.rd-bracket li > .rd-bracket li:first-child::after { top: -18px; }
+
+/* A two-voice excerpt (Art, Labor, and AI Anxiety): lines alternate sides like a conversation. */
+.prose .dialogue { display: flex; flex-direction: column; gap: 0.9em; margin-bottom: 0.9em; }
+.prose .dialogue p { margin: 0; max-width: 78%; }
+.prose .dialogue p.them { align-self: flex-start; text-align: left; }
+.prose .dialogue p.me { align-self: flex-end; text-align: right; }
+
+/* ── Keyboard focus looks like hover: tabbing through the site shows the same green highlight
+   as pointing at things. The usual focus ring is dropped where the hover state is visible enough;
+   it stays on buttons, form controls, gallery items and the Are.na badge, whose hover alone
+   wouldn't show where focus is. ── */
+a:focus-visible { background: var(--green); }
+.prose a.external:focus-visible, .prose a.internal:focus-visible, .prose a.jump:focus-visible { color: var(--ink); }
+.reveal:focus-visible { background: var(--green); color: var(--ink); }
+.crumbs a:focus-visible { background: var(--green); color: var(--ink); }
+.more-link:focus-visible { background: var(--green); }
+.sec summary:focus-visible { background: var(--green); }
+.sec-list a:focus-visible { background: none; }
+.sec-list a:focus-visible .sec-label { background: var(--green); color: var(--ink); }
+.sec-list a:focus-visible::before { color: var(--ink); }
+.more summary:focus-visible { background: var(--green); }
+.tile-link:focus-visible { background: none; }
+.arena-item:focus-visible { background: none; }
+.arena-item:focus-visible .arena-text, .arena-item:focus-visible .arena-card { background: var(--green); }
+.masthead .crumbs a:focus-visible { background: var(--green); color: var(--ink); }
+.masthead a.external:focus-visible { color: var(--ink); }
+.mockbar a:focus-visible { color: var(--ink); }
+.arena-badge:focus-visible { background: var(--green); }
+.rd-mark:focus-visible { background: var(--ink); color: var(--paper); }
+a:focus-visible:not(.arena-item):not(.arena-badge), summary:focus-visible, .reveal:focus-visible { outline: none; box-shadow: none; }

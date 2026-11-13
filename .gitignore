@@ -1,0 +1,7 @@
+# dependencies and build output (Vercel rebuilds these)
+node_modules/
+_site/
+.cache/
+# private working notes
+arena-report.md
+.DS_Store
