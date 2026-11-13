@@ -206,7 +206,7 @@
     const sec = filterKey && document.getElementById("sec-" + filterKey);
     const title = sec && sec.querySelector(".sec-title").textContent;
     filterGallery(sec ? filterKey : null);
-    document.title = title || "Body of Work";
+    document.title = title || "Zanyiah Hill-Milling — Body of Work";
     // Full name on the landing state; first name only once a section joins the trail.
     document.querySelector(".crumbs").innerHTML = title
       ? `<li><span>ZANYIAH</span>${sep}</li><li><a href="/" data-swap>Index</a>${sep}</li><li><span aria-current="page">${title}</span></li>`

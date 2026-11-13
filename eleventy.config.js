@@ -63,6 +63,17 @@ export default function (eleventyConfig) {
     return [...list.slice(i + 1), ...list.slice(0, Math.max(i, 0))];
   });
 
+  // Plain-text summary for search results and link previews: the opening of the page's text, ~155 characters.
+  eleventyConfig.addFilter("excerpt", (html, n = 155) => {
+    const text = String(html || "")
+      .replace(/<span class="vh">[\s\S]*?<\/span>/g, "")
+      .replace(/<summary>[\s\S]*?<\/summary>/g, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/[↗↓↳]/g, "")
+      .replace(/\s+/g, " ").trim();
+    return text.length > n ? text.slice(0, n).replace(/\s+\S*$/, "") + "…" : text;
+  });
+
   eleventyConfig.addFilter("recentFirst", (projects) => [
     ...projects.filter((p) => p.data.status === "recent").sort((a, b) => (a.data.sourceOrder ?? 0) - (b.data.sourceOrder ?? 0)),
     ...projects.filter((p) => p.data.status !== "recent"),

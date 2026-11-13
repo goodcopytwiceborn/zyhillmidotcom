@@ -38,15 +38,36 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {#- Tab title: the Index section and the item — "Work in Progress — The Oz", "Nodes — How is work…";
-      a section filter alone on the home page ("Work in Progress", set by swap.js); otherwise "Body of Work". -#}
-  <title>{% if view == "project" %}{{ (sections | sectionByKey(status)).title }} — {{ title }}{% elif view == "node" %}Nodes — {{ node.question }}{% elif view == "about" %}{{ title }}{% else %}Body of Work{% endif %}</title>
+      a section filter alone on the home page ("Work in Progress", set by swap.js); otherwise "Zanyiah Hill-Milling — Body of Work". -#}
+  {%- set pageTitle -%}{% if view == "project" %}{{ (sections | sectionByKey(status)).title }} — {{ title }}{% elif view == "node" %}Nodes — {{ node.question }}{% elif view == "about" %}{{ title }}{% else %}{{ site.homeTitle }}{% endif %}{%- endset %}
+  {%- set pageDesc -%}{% if view == "project" %}{{ content | excerpt }}{% elif view == "node" %}{{ node.description | trim }}{% elif view == "about" %}{{ site.readmeDescription }}{% else %}{{ site.homeDescription }}{% endif %}{%- endset %}
+  <title>{{ pageTitle }}</title>
+  {#- Search engines and link previews (LinkedIn, iMessage, etc.) -#}
+  <meta name="description" content="{{ pageDesc }}">
+  <meta name="author" content="{{ site.person }}">
+  <link rel="canonical" href="{{ site.url }}{{ page.url }}">
+  <meta property="og:type" content="{% if view == 'home' %}website{% else %}article{% endif %}">
+  <meta property="og:site_name" content="{{ site.homeTitle }}">
+  <meta property="og:title" content="{% if view == 'home' %}{{ pageTitle }}{% else %}{{ pageTitle }} — {{ site.person }}{% endif %}">
+  <meta property="og:description" content="{{ pageDesc }}">
+  <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+  <meta name="twitter:card" content="summary">
+  {%- if view == "home" %}
+  {#- Tells search engines this site, LinkedIn and Are.na are the same person. -#}
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@graph":[
+    {"@type":"Person","@id":"{{ site.url }}/#zanyiah","name":"{{ site.person }}","alternateName":["zyhillmi","Zanyiah"],"url":"{{ site.url }}/","description":"{{ site.homeDescription }}","sameAs":[{% for pl in site.platforms %}{% if pl.external and pl.url %}{% if not loop.first %},{% endif %}"{{ pl.url }}"{% endif %}{% endfor %}]},
+    {"@type":"WebSite","@id":"{{ site.url }}/#website","name":"Body of Work","alternateName":"{{ site.homeTitle }}","url":"{{ site.url }}/","author":{"@id":"{{ site.url }}/#zanyiah"}}
+  ]}
+  </script>
+  {%- endif %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400;0,700;1,400&display=swap">
   <link rel="stylesheet" href="/assets/site.css">
   <script>document.documentElement.classList.add("js");</script>
   <script src="/assets/mockup.js" defer></script>
-  <script src="/assets/swap.js?v=15" defer></script>
+  <script src="/assets/swap.js?v=16" defer></script>
 </head>
 <body data-view="{{ view }}" data-home-state="{{ homeState or '' }}" data-font="mono" data-meta="mono" data-bio="a">
   <a class="skip" href="{% if view == 'home' %}#col1{% else %}#col2{% endif %}">Skip to content</a>
