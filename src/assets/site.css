@@ -240,7 +240,6 @@ body[data-bio="a"] .bio--b, body[data-bio="b"] .bio--a { display: none; }
 .prose ul.about-list { list-style: none; padding-left: 0; }
 .col2 .about-h:first-child { margin-top: 0; }
 .note { color: var(--grey); font-size: 14px; border-left: 3px solid var(--green); padding-left: 10px; }
-.to-index { display: none; margin-top: 24px; }
 
 /* [read more] expands in place */
 .more summary { list-style: none; font-family: var(--meta); font-size: 13px; margin-bottom: 0.9em; width: fit-content; }
@@ -422,7 +421,6 @@ body[data-view="home"] .tiles { grid-template-columns: repeat(3, minmax(0, 1fr))
   body:not([data-view="home"]) .col2 { order: 1; }
   body:not([data-view="home"]) .col3 { order: 2; }
   body:not([data-view="home"]) .col1 { order: 3; }
-  .to-index { display: block; }
   .legend { margin-left: 0; }
 }
 @media (max-width: 600px) {
